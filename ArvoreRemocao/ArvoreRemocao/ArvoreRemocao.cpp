@@ -83,7 +83,7 @@ void menu()
 void inicializar()
 {
 
-	// provisÛrio porque n„o libera a memoria usada pela arvore
+	// provis√≥rio porque n√£o libera a memoria usada pela arvore
 	raiz = NULL;
 
 	cout << "Arvore inicializada \n";
@@ -150,24 +150,20 @@ NO* criaNO(int valor)
 
 NO* insereArvore(NO* no, int valor)
 {
-	if (no->valor > valor && no->esq == NULL) {
-		no->esq = criaNO(valor);
-		return no->esq;
+	if (no == NULL) // ponto de insercao
+	{
+		return criaNO(valor);
 	}
-	else if (no->valor < valor && no->dir == NULL) {
-		no->dir = criaNO(valor);
-		return no->dir;
+	else
+	{
+		if (valor < no->valor) {
+			no->esq = insereArvore(no->esq, valor);
+		}
+		else {
+			no->dir = insereArvore(no->dir, valor);
+		}
+		return no;
 	}
-	else if (no->valor > valor) {
-		return insereArvore(no->esq, valor);
-	}
-	else if (no->valor < valor) {
-		return insereArvore(no->dir, valor);
-	}
-	else {
-		return NULL;
-	}
-
 
 }
 
@@ -245,44 +241,53 @@ void removerElementoArvore(NO* no, int valor) {
 		cout << "Elemento nao encontrado \n";
 		return;
 	}
+	else if (atual->dir == NULL && atual->esq == NULL) {     // caso 1: sem filhos	
+		if (atual->valor > pai->valor) {
+			pai->dir = NULL;
+		}
+		else {
+			pai->esq = NULL;
+		}
+		free(atual);
 
-
-	// caso 1: sem filhos	
-	
-
-	// caso 2: um filho	
-	
-
-	// caso 3: dois filhos
-
-	// procura o elmento mais a esquerda da sub-arvore da direita
-	NO* sucessor = atual->dir;
-	NO* paiSucessor = atual;
-	while (sucessor->esq != NULL) {
-		paiSucessor = sucessor;
-		sucessor = sucessor->esq;
+		cout << "Elemento sem filhos excluido! \n";
+	}      //     1 filho do lado direito               ou       1 filho do lado esquerdo
+	else if ( (atual->dir != NULL && atual->esq==NULL) || (atual->esq != NULL && atual->dir == NULL) ) {      // caso 2: um filho
+		
+		if (atual->dir != NULL) {
+			pai->dir = atual->dir;
+		}
+		else {
+			pai->esq = atual->esq;
+		}
+		cout << "Elemento com um filho excluido! \n";
 	}
+	else if (atual->dir != NULL && atual->esq != NULL) {     // caso 3: dois filhos
 
-	// copia o valor do sucessor para o no atual
-	atual->valor = sucessor->valor;
+		// procura o elmento mais a esquerda da sub-arvore da direita
+		NO* sucessor = atual->dir;
+		NO* paiSucessor = atual;
+		while (sucessor->esq != NULL) {
+			paiSucessor = sucessor;
+			sucessor = sucessor->esq;
+		}
 
-	// se existir uma sub-arvore a direita do sucessor , entao
-	// ela deve ser ligada ao pai do sucessor
-	if (sucessor->dir != NULL)
-	{
-		paiSucessor->esq = sucessor->dir;
+		// copia o valor do sucessor para o no atual
+		atual->valor = sucessor->valor;
+
+		// se existir uma sub-arvore a direita do sucessor , entao
+		// ela deve ser ligada ao pai do sucessor
+		if (sucessor->dir != NULL)
+		{
+			paiSucessor->esq = sucessor->dir;
+		}
+		else {
+			paiSucessor->esq = NULL;
+		}
+
+		//libera memoria
+		free(sucessor);
+
+		cout << "Elemento com dois filhos excluido! \n";
 	}
-	else {
-		paiSucessor->esq = NULL;
-	}
-
-	//libera memoria
-	free(sucessor);
-
-
 }
-
-
-
-
-
